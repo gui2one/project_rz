@@ -1,0 +1,9 @@
+setlocal
+powershell -noprofile -executionpolicy Bypass -file D:/code_playground/gtkmm_test/vcpkg/scripts/buildsystems/msbuild/applocal.ps1 -targetBinary D:/code_playground/gtkmm_test/build/Release/sequencer.exe -installedDir D:/code_playground/gtkmm_test/vcpkg/installed/x64-windows/bin -OutVariable out
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
