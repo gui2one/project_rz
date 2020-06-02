@@ -15,21 +15,26 @@
 
 Glib::RefPtr<Gtk::Application> app;
 
-void func() {
+void on_activate() {
 	printf("my FUNCTION\n");
 }
 
 int main(int argc, char *argv[])
 {
 
-	//gui2oneFaceDetector face_detector;
+	gui2oneFaceDetector face_detector;
 	app = Gtk::Application::create(argc, argv, "org.gtkmm.examples.base");
 
 
-	app->signal_activate().connect(&func);
+	app->signal_activate().connect(&on_activate);
 
 	UIWindow ui_window;
 	LiveWindow live_window;	
+	
+
+
+	face_detector.update();
+
 	
 
 	return app->run(ui_window, argc, argv);

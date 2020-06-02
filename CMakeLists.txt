@@ -25,6 +25,14 @@ add_custom_command(
         $<TARGET_FILE_DIR:sequencer>/res
 )
 
+add_custom_command(
+    TARGET sequencer 
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/data
+        $<TARGET_FILE_DIR:sequencer>/data
+)
+
 # add_custom_command(
 #     TARGET sequencer 
 #     POST_BUILD
