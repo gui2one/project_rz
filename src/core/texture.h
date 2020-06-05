@@ -17,7 +17,7 @@ class Texture
 		void load_async(std::string path);
 		void setData(int width, int height, unsigned char* buffer, int bpp = 4);
 
-		inline unsigned int getID(){ return id; }
+		inline unsigned int getID() const { return id; }
 		inline int getWidth(){ return width; }
 		inline int getHeight(){ return height; }
 		inline int getBPP(){ return bpp; }
@@ -43,10 +43,10 @@ class Texture
 		
 		bool is_valid = false;
 		std::vector<unsigned char> data;
-		
+		unsigned int id = 0;
 		std::future<unsigned char*> async_load;
 	private:
-		unsigned int id = 0;
+		
 
 		int width, height, bpp;	
 		

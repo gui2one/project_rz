@@ -6,7 +6,7 @@
 #include "opencv2/videoio.hpp"
 #include "opencv2/imgproc.hpp"
 #include "opencv2/opencv.hpp"
-
+#include "FrameData.h"
 
 class gui2oneFaceDetector
 {
@@ -15,6 +15,11 @@ public :
 	gui2oneFaceDetector();
 
 	~gui2oneFaceDetector();
+
+	inline void setFrameData(FrameData* ptr)
+	{
+		m_frame_data = ptr;
+	}
 
 	void initCvDnnNet();
 	std::vector<cv::Rect> detectFaces(cv::Mat& frame);
@@ -30,5 +35,8 @@ public :
 	
 
 private:
+
+	FrameData * m_frame_data = nullptr;
+
 };
 

@@ -6,46 +6,9 @@ gui2oneFaceDetector::gui2oneFaceDetector()
 {
 	printf("--- Face Detector Init ---\n");
 
-	input_frame = cv::imread("data/group_1.jpg", cv::IMREAD_COLOR);
+	//input_frame = cv::imread("data/group_1.jpg", cv::IMREAD_COLOR);
 	
 	initCvDnnNet();
-	
-	cv::VideoCapture cap("../../data/videos/public_stade_rennais.mp4");	
-
-	if (!cap.isOpened()) {
-
-		printf("capture not Opened \n");
-	}
-
-	cv::Mat frame, small, grey;
-	for (;;)
-	{
-		// wait for a new frame from camera and store it into 'frame'
-		cap.read(frame);
-
-		
-		// check if we succeeded
-		if (frame.empty()) {
-			std::cerr << "ERROR! blank frame grabbed\n";
-			break;
-		}
-		// show live and wait for a key with timeout long enough to show images
-		
-		cv::resize(frame, small, cv::Size(1024, 576));
-
-		//detector.detectMultiScale(small, faces);
-		faces = detectFaces(small);
-		for (auto face : faces) {
-			cv::rectangle(small, face, (0, 0, 255), 2);
-		}
-
-		
-		imshow("Live", small);
-		if (cv::waitKey(5) >= 0)
-			break;
-	}
-	
-	
 }
 
 gui2oneFaceDetector::~gui2oneFaceDetector()
@@ -54,18 +17,33 @@ gui2oneFaceDetector::~gui2oneFaceDetector()
 
 void gui2oneFaceDetector::update()
 {
+	if (m_frame_data != nullptr) {
 
+		cv::Mat small, grey;
 
-	//cv::imshow("capture", input_frame);
+		
+		// show live and wait for a key with timeout long enough to show images
+		
+		if (!m_frame_data->cv_frame.empty()) {
+
+			
+			cv::resize(m_frame_data->cv_frame, small, cv::Size(1024, 576));
+			m_frame_data->faces_rects = detectFaces(small);
+
+			//printf("detecting  faces : %d\n", m_frame_data->faces_rects.size());
+			//for (auto face : faces) {
+			//	cv::rectangle(small, face, (0, 0, 255), 2);
+			//}
+
+			
+		}
+	}
+
 }
 
 void gui2oneFaceDetector::initCvDnnNet()
 {
-	// "./data/deploy.prototxt.txt", "./data/res10_300x300_ssd_iter_140000.caffemodel"
 
-	//m_dnn_net.setPreferableTarget(cv::dnn::DNN_TARGET_OPENCL_FP16 || cv::dnn::DNN_TARGET_OPENCL);
-	//m_dnn_net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
-	
 	m_dnn_net = cv::dnn::readNetFromCaffe("./data/deploy.prototxt.txt", "./data/res10_300x300_ssd_iter_140000.caffemodel");
 
 

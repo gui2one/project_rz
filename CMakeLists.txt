@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 
 set(CMAKE_TOOLCHAIN_FILE "vcpkg/scripts/buildsystems/vcpkg.cmake")
 
-project(sequencer)
+project(Trackoo)
 
 add_definitions(-DOGL_DEBUG)
 
@@ -13,33 +13,34 @@ file(GLOB_RECURSE libsCollection "vcpkg/installed/x64-windows/lib/*.lib")
 file(GLOB_RECURSE fileCollection "src/*.cpp" "src/*.h")
 
 
-add_executable(sequencer
+add_executable(${CMAKE_PROJECT_NAME}
     ${fileCollection}
 )
 
 add_custom_command(
-    TARGET sequencer 
+    TARGET ${CMAKE_PROJECT_NAME} 
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/src/res
-        $<TARGET_FILE_DIR:sequencer>/res
+        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/res
 )
 
 add_custom_command(
-    TARGET sequencer 
+    TARGET ${CMAKE_PROJECT_NAME} 
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${PROJECT_SOURCE_DIR}/data
-        $<TARGET_FILE_DIR:sequencer>/data
+        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/data
 )
 
-# add_custom_command(
-#     TARGET sequencer 
-#     POST_BUILD
-#     COMMAND ${CMAKE_COMMAND} -E copy_directory
-#         ${PROJECT_SOURCE_DIR}/share
-#         $<TARGET_FILE_DIR:sequencer>/share
-# )
+add_custom_command(
+    TARGET ${CMAKE_PROJECT_NAME}  
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${PROJECT_SOURCE_DIR}/share
+        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/share
+)
+
 
 foreach(FILE ${fileCollection}) 
     # Get the directory of the source file
@@ -65,7 +66,7 @@ foreach(FILE ${fileCollection})
 endforeach()
 
 target_include_directories(
-    sequencer PRIVATE
+    ${CMAKE_PROJECT_NAME} PRIVATE
 
     vcpkg/installed/x64-windows/include/
 
@@ -73,12 +74,12 @@ target_include_directories(
 )
 
 target_link_directories(
-    sequencer PUBLIC
+    ${CMAKE_PROJECT_NAME} PUBLIC
 
     vcpkg/installed/x64-windows/lib/
 )
 
-target_link_libraries(sequencer
+target_link_libraries(${CMAKE_PROJECT_NAME}
 
     ${libsCollection}
 

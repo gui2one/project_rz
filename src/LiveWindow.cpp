@@ -3,8 +3,8 @@
 LiveWindow::LiveWindow()
 {
 	set_title("Live Window");
-
-	
+	set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DIALOG);
+	set_size_request(1280, 720);
 
 	
 	add(m_gl_area);
@@ -12,20 +12,23 @@ LiveWindow::LiveWindow()
 	m_gl_area.signal_realize().connect(sigc::mem_fun(this, &LiveWindow::on_gl_area_realize), false);
 	m_gl_area.signal_render().connect(sigc::mem_fun(this, &LiveWindow::on_gl_area_render), false);
 
-	set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DIALOG);
-
-	set_size_request(640, 360);
 
 	show_all();
 
 
-	Mesh mesh = Utils::makeSimpleQuad(1,1);
+	Mesh mesh = Utils::makeSimpleQuad(2,2);
+	Utils::translateMesh(mesh, glm::vec3(-1.0, -1.0, 0.0));
 	m_mesh_object.setMesh(mesh);
 
 
-	m_default_shader.loadVertexShaderSource("../../src/res/shaders/screen_shader.vert");
-	m_default_shader.loadFragmentShaderSource("../../src/res/shaders/screen_shader.frag");
-	m_default_shader.createShader();
+	m_screen_shader.loadVertexShaderSource("../../src/res/shaders/screen_shader.vert");
+	m_screen_shader.loadFragmentShaderSource("../../src/res/shaders/screen_shader.frag");
+	m_screen_shader.createShader();
+
+	m_texture.load("data/group_1.jpg");
+
+	//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+	glGenTextures(1, &texture_id);
 }
 
 void LiveWindow::on_window_realize()
@@ -39,23 +42,24 @@ void LiveWindow::on_window_realize()
 gboolean LiveWindow::on_gl_area_render(const Glib::RefPtr<Gdk::GLContext>& context)
 {
 	//g_print("render gl\n");
+	//BindCVMat2GLTexture(frame_data->cv_frame, texture_id);
+	cv::Mat temp = frame_data->cv_frame;
+	for (auto rect : frame_data->faces_rects) {
+		cv::rectangle(temp, rect, cv::Scalar(255, 0, 0), 2);
+	}
+	BindCVMat2GLTexture(temp, m_texture.id);
 
-
-	GLCall(glClearColor(0.0, 0.5, 0.5, 1.0));
+	GLCall(glClearColor(0.0, 0.0, 0.0, 1.0));
 	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
 	
-	glLoadIdentity();
-/*
-	glMatrixMode(GL_PROJECTION);
+	//glLoadIdentity();
 
-	glMatrixMode(GL_MODELVIEW);*/
 
-	glLoadIdentity();
-	glOrtho(0.0, 1.0, 0.0, 1.0, -1.0, 1.0);
-	GLCall(glPointSize(3.0));
 
-	m_default_shader.useProgram();
+	m_screen_shader.useProgram();
+	glBindTexture(GL_TEXTURE_2D, m_texture.id);
 	m_mesh_object.render();
+	glBindTexture(GL_TEXTURE_2D, 0);
 	GLCall(glUseProgram(0));
 	
 	m_gl_area.queue_render();
@@ -82,8 +86,43 @@ void LiveWindow::on_gl_area_realize()
 	g_print("\t-Shading Language : %s\n", glsl_version);
 	g_print("---------------------------\n");
 
-	glEnable(GL_DEPTH_TEST);
+	GLCall(glEnable(GL_DEPTH_TEST));
+	
 	m_gl_area.queue_render();
 
 
+}
+
+
+void LiveWindow::BindCVMat2GLTexture(cv::Mat& image, GLuint& imageTexture)
+{
+	if (image.empty()) {
+		std::cout << "image empty" << std::endl;
+	}
+	else {
+		
+		//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+
+		glBindTexture(GL_TEXTURE_2D, imageTexture);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+		// Set texture clamping method
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+
+		cv::Mat rgb_image;
+		cv::cvtColor(image, rgb_image, cv::COLOR_BGR2RGB);
+
+		glTexImage2D(GL_TEXTURE_2D,         // Type of texture
+			0,                   // Pyramid level (for mip-mapping) - 0 is the top level
+			GL_RGB,              // Internal colour format to convert to
+			image.cols,          // Image width  i.e. 640 for Kinect in standard mode
+			image.rows,          // Image height i.e. 480 for Kinect in standard mode
+			0,                   // Border width in pixels (can either be 1 or 0)
+			GL_RGB,              // Input image format (i.e. GL_RGB, GL_RGBA, GL_BGR etc.)
+			GL_UNSIGNED_BYTE,    // Image data type
+			rgb_image.ptr());        // The actual image data itself
+	}
 }
