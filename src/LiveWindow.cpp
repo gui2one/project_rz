@@ -2,6 +2,7 @@
 
 LiveWindow::LiveWindow()
 {
+	//printf("LIVE WINDOW constructor\n");
 	set_title("Live Window");
 	set_type_hint(Gdk::WindowTypeHint::WINDOW_TYPE_HINT_DIALOG);
 	set_size_request(1280, 720);
@@ -35,34 +36,47 @@ void LiveWindow::on_window_realize()
 {
 
 		m_gl_area.queue_draw();
-		g_print("gl_on_realize\n");
+		//g_print("gl_on_realize\n");
 	
 }
 
 gboolean LiveWindow::on_gl_area_render(const Glib::RefPtr<Gdk::GLContext>& context)
 {
-	//g_print("render gl\n");
-	//BindCVMat2GLTexture(frame_data->cv_frame, texture_id);
-	cv::Mat temp = frame_data->cv_frame;
-	for (auto rect : frame_data->faces_rects) {
-		cv::rectangle(temp, rect, cv::Scalar(255, 0, 0), 2);
+	
+	
+	if (core != nullptr) {
+
+		//g_print("accessing Core\n");
+		cv::Mat temp = core->capture_frame;
+		float ratio = temp.size().width / core->face_detector->m_process_size.width;
+		for (auto rect : core->face_detector->faces_rects) 
+		{
+			
+			cv::Rect new_rect = rect;
+			new_rect.x *= ratio;
+			new_rect.y *= ratio;
+			new_rect.width *= ratio;
+			new_rect.height *= ratio;
+			cv::rectangle(temp, new_rect, cv::Scalar(255, 0, 0), 2);
+		}
+		BindCVMat2GLTexture(temp, m_texture.id);
+
+		GLCall(glClearColor(0.0, 0.0, 0.0, 1.0));
+		GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
+	
+		//glLoadIdentity();
+
+
+
+		m_screen_shader.useProgram();
+		glBindTexture(GL_TEXTURE_2D, m_texture.id);
+		m_mesh_object.render();
+		glBindTexture(GL_TEXTURE_2D, 0);
+		GLCall(glUseProgram(0));
+	
+		m_gl_area.queue_render();
+
 	}
-	BindCVMat2GLTexture(temp, m_texture.id);
-
-	GLCall(glClearColor(0.0, 0.0, 0.0, 1.0));
-	GLCall(glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT));
-	
-	//glLoadIdentity();
-
-
-
-	m_screen_shader.useProgram();
-	glBindTexture(GL_TEXTURE_2D, m_texture.id);
-	m_mesh_object.render();
-	glBindTexture(GL_TEXTURE_2D, 0);
-	GLCall(glUseProgram(0));
-	
-	m_gl_area.queue_render();
 	return true;
 }
 
@@ -75,7 +89,7 @@ void LiveWindow::on_gl_area_realize()
 	if (glewInit() != GLEW_OK) {
 		g_print("error with GLEW\n");
 	}else{
-		printf("GLEW ok\n");
+		//printf("GLEW ok\n");
 	}
 
 	const unsigned char * gl_version = glGetString(GL_VERSION);

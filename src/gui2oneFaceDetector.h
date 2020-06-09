@@ -16,27 +16,26 @@ public :
 
 	~gui2oneFaceDetector();
 
-	inline void setFrameData(FrameData* ptr)
-	{
-		m_frame_data = ptr;
-	}
+
 
 	void initCvDnnNet();
+	inline void setInputFrame(cv::Mat _frame) { m_input_frame = _frame; }
 	std::vector<cv::Rect> detectFaces(cv::Mat& frame);
 	void update();
 
 	
-	cv::Mat input_frame;
+	
 
 	cv::dnn::Net m_dnn_net;
-	std::vector<cv::Rect> faces;
+
+	cv::Size m_process_size;
+	std::vector<cv::Rect> faces_rects;
 	
 
 	
 
 private:
-
-	FrameData * m_frame_data = nullptr;
+	cv::Mat m_input_frame;
 
 };
 

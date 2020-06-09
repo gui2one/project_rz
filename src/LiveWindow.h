@@ -7,6 +7,7 @@
 #include "3d_utils.h"
 #include "core.h"
 #include "FrameData.h"
+#include "trackoo_core.h"
 #include "opencv2/imgproc.hpp"
 
 class LiveWindow : public Gtk::Window
@@ -23,6 +24,8 @@ public:
 	gboolean on_gl_area_render(const Glib::RefPtr<Gdk::GLContext>& context);
 
 	
+	inline void bindCore(TrackooCore * ptr) { core = ptr;  }
+
 	void on_gl_area_realize();
 
 	void BindCVMat2GLTexture(cv::Mat& image, GLuint& imageTexture);
@@ -38,6 +41,8 @@ private:
 	GLuint texture_id;
 
 	FrameData* frame_data = nullptr;
+
+	TrackooCore* core = nullptr;
 
 protected:
 	

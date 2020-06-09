@@ -2,7 +2,8 @@
 #include <vector>
 #include <stdio.h>
 #include <iostream>
-gui2oneFaceDetector::gui2oneFaceDetector()
+gui2oneFaceDetector::gui2oneFaceDetector():
+	m_process_size(cv::Size(640,360))
 {
 	printf("--- Face Detector Init ---\n");
 
@@ -17,27 +18,16 @@ gui2oneFaceDetector::~gui2oneFaceDetector()
 
 void gui2oneFaceDetector::update()
 {
-	if (m_frame_data != nullptr) {
-
-		cv::Mat small, grey;
 
 		
-		// show live and wait for a key with timeout long enough to show images
-		
-		if (!m_frame_data->cv_frame.empty()) {
+		if (!m_input_frame.empty()) {
 
-			
-			cv::resize(m_frame_data->cv_frame, small, cv::Size(1024, 576));
-			m_frame_data->faces_rects = detectFaces(small);
-
-			//printf("detecting  faces : %d\n", m_frame_data->faces_rects.size());
-			//for (auto face : faces) {
-			//	cv::rectangle(small, face, (0, 0, 255), 2);
-			//}
-
-			
+			cv::Mat small;
+			cv::resize(m_input_frame, small, m_process_size);
+			faces_rects = detectFaces(small);
+	
 		}
-	}
+	
 
 }
 
@@ -49,6 +39,7 @@ void gui2oneFaceDetector::initCvDnnNet()
 
 	m_dnn_net.setPreferableBackend(cv::dnn::DNN_BACKEND_OPENCV);
 	m_dnn_net.setPreferableTarget(cv::dnn::DNN_TARGET_OPENCL);
+
 
 }
 
