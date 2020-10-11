@@ -21,16 +21,16 @@ add_custom_command(
     TARGET ${CMAKE_PROJECT_NAME} 
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/src/res
-        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/res
+        ${PROJECT_SOURCE_DIR}\\src\\res
+        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\\res
 )
 
 add_custom_command(
     TARGET ${CMAKE_PROJECT_NAME} 
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
-        ${PROJECT_SOURCE_DIR}/data
-        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>/data
+        ${PROJECT_SOURCE_DIR}\\data
+        $<TARGET_FILE_DIR:${CMAKE_PROJECT_NAME}>\\data
 )
 
 # add_custom_command(

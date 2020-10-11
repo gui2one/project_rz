@@ -26,7 +26,7 @@ LiveWindow::LiveWindow()
 	m_screen_shader.loadFragmentShaderSource("../../src/res/shaders/screen_shader.frag");
 	m_screen_shader.createShader();
 
-	m_texture.load("data/group_1.jpg");
+	m_texture.load("data/image.jpg");
 
 	//glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 	glGenTextures(1, &texture_id);
@@ -48,16 +48,26 @@ gboolean LiveWindow::on_gl_area_render(const Glib::RefPtr<Gdk::GLContext>& conte
 
 		//g_print("accessing Core\n");
 		cv::Mat temp = core->capture_frame;
-		float ratio = temp.size().width / core->face_detector->m_process_size.width;
+		//float ratio = temp.size().width / core->face_detector->m_process_size.width;
+		float ratio = temp.size().width / (float)temp.size().height;
+
+		//printf("ratio : %.3f \n", ratio);
 		for (auto rect : core->face_detector->faces_rects) 
 		{
 			
 			cv::Rect new_rect = rect;
-			new_rect.x *= ratio;
+			//new_rect.x *= ratio;
 			new_rect.y *= ratio;
-			new_rect.width *= ratio;
+			//new_rect.width *= ratio;
 			new_rect.height *= ratio;
-			cv::rectangle(temp, new_rect, cv::Scalar(255, 0, 0), 2);
+			cv::rectangle(temp, new_rect, cv::Scalar(0, 0, 255), 2);
+		}
+
+		for (auto shape : core->features_detect->m_shapes) {
+			for (auto point : shape) {
+
+				cv::circle(temp, point, 5, cv::Scalar(255,0,0));
+			}
 		}
 		BindCVMat2GLTexture(temp, m_texture.id);
 
@@ -111,7 +121,7 @@ void LiveWindow::on_gl_area_realize()
 void LiveWindow::BindCVMat2GLTexture(cv::Mat& image, GLuint& imageTexture)
 {
 	if (image.empty()) {
-		std::cout << "image empty" << std::endl;
+		//std::cout << "image empty" << std::endl;
 	}
 	else {
 		

@@ -23,6 +23,9 @@ public :
 	std::vector<cv::Rect> detectFaces(cv::Mat& frame);
 	void update();
 
+	inline cv::Mat getCaptureFrame() {
+		return m_input_frame;
+	};
 	
 	
 
@@ -30,6 +33,7 @@ public :
 
 	cv::Size m_process_size;
 	std::vector<cv::Rect> faces_rects;
+	
 	
 
 	
@@ -39,3 +43,4 @@ private:
 
 };
 
+	

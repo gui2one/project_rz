@@ -7,9 +7,17 @@
 
 #include "pch.h"
 
-class aaa
+class gui2oneFeaturesDetect
 {
 
 public:
-	aaa();
+	
+	gui2oneFeaturesDetect();
+
+	void getFeatures(cv::Mat& image);
+
+	cv::CascadeClassifier face_cascade;
+	cv::Ptr < cv::face::Facemark > facemark;
+
+	std::vector<std::vector<cv::Point2f>> m_shapes;
 };

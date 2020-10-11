@@ -4,7 +4,7 @@
 #include <mutex>
 
 #include "gui2oneFaceDetector.h"
-
+#include "gui2oneFeaturesDetect.h"
 
 /*
 	singleton pattern : instantiate with getInstance() method
@@ -29,6 +29,8 @@ public:
 
 
 	gui2oneFaceDetector* face_detector;
+	gui2oneFeaturesDetect* features_detect;
+
 	cv::Mat capture_frame;
 
 

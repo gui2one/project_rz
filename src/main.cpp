@@ -14,20 +14,22 @@
 #include "pch.h"
 
 #include "trackoo_core.h"
-
+#include "aaa.h"
 
 gui2oneFaceDetector face_detector;
+gui2oneFeaturesDetect features_detect;
+
 TrackooCore * tk_core;
 Glib::RefPtr<Gtk::Application> app;
 
 
-
+//aaa* _aaa = new aaa();
 
 
 void capture_loop() {
 
 	cv::Mat captured;
-	cv::VideoCapture cap("../../data/videos/public_stade_rennais.mp4");
+	cv::VideoCapture cap(0);
 	while (true) {
 
 		cap >> captured;
@@ -45,6 +47,8 @@ void face_detect_loop() {
 	{
 		face_detector.setInputFrame(tk_core->capture_frame);
 		face_detector.update();
+
+		features_detect.getFeatures(tk_core->capture_frame);
 	}
 }
 
@@ -75,6 +79,7 @@ int main(int argc, char *argv[])
 
 
 	tk_core->face_detector = &face_detector;
+	tk_core->features_detect = &features_detect;
 	live_window.bindCore(tk_core);
 
 	//while (true) 

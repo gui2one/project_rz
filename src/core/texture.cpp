@@ -33,7 +33,7 @@ void Texture::load(std::string path)
 	glGenTextures(1, &id);
 	glBindTexture(GL_TEXTURE_2D, id);
 	
-	stbi_set_flip_vertically_on_load(1);
+	//stbi_set_flip_vertically_on_load(1);
 	unsigned char* buffer = stbi_load(path.c_str(), &width, &height, &bpp, 4);
 	//~ async_load = std::async(std::launch::async, stbi_load, path.c_str(), &width, &height, &bpp, 4);
 	
